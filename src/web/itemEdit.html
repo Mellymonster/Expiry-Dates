@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Edit grocery</title>
+    <style>
+    </style>
+  </head>
+  <body>
+    <section>
+        <section>
+            <h1>Edit grocery</h1>
+            <input type="text" id="item-name-input" />
+            expiring on
+            <input type="date" id="expiry-date-input" />
+            <button id="submit-btn">Submit</button>
+            <br />
+            <br />
+            <button id="see-all-btn">
+                See all groceries
+            </button>
+            <button id="go-home-btn">Home</button>
+        </section>
+
+    </section>
+    
+    <script>
+        async function getItem() {
+            try {
+                const httpResponse = await fetch('/api' + window.location.pathname);
+                const jsonResponse = await httpResponse.json();
+
+                const item = jsonResponse.results.item;
+                const itemNameInput = document.getElementById("item-name-input");
+                itemNameInput.value = item.name;
+
+                const expiryDateInput = document.getElementById("expiry-date-input");
+                expiryDateInput.value = item.expiryDate;
+            } catch {
+                alert('Oops! An error occurred..');
+            }
+        }
+        getItem();
+
+        async function editItem() {
+            const itemNameInput = document.getElementById("item-name-input");
+            const expiryDateInput = document.getElementById("expiry-date-input");
+
+            const item = {
+                id: window.location.pathname.replace('/items/', ''),
+                name: itemNameInput.value,
+                expiryDate: expiryDateInput.value,
+            };
+
+            try {
+                const httpResponse = await fetch('/api/items', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(item)
+                });
+                const jsonResponse = await httpResponse.json();
+                alert(jsonResponse.message);
+                window.location.assign('/items');
+            } catch {
+                alert('Oops! An error occurred..');
+            }
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.addEventListener('click', editItem);
+
+        const goHomeBtn = document.getElementById('go-home-btn');
+        goHomeBtn.addEventListener('click', () => {
+            window.location.assign('/');
+        });
+
+        const seeAllGroceriesBtn = document.getElementById('see-all-btn');
+        seeAllGroceriesBtn.addEventListener('click', () => {
+            window.location.assign('/items');
+        });
+    </script>
+  </body>
+</html>

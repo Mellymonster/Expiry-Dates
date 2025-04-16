@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>All my groceries</title>
+    <style>
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+          
+        .td, .th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+          
+        .tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+        
+        .create-btn {
+            margin-right: 12px;
+        }
+        
+        .expired {
+            color: red;
+        }
+    </style>
+  </head>
+  <body>
+    <section>
+        <h1>My groceries</h1>
+        <table class="table" id="grocery-table">
+            <thead>
+                <tr>
+                    <th class="th">Item</th>
+                    <th class="th">Expires on</th>
+                    <th class="th">Actions</th>
+                </tr> 
+            </thead>
+            <tbody id="tbody">
+
+            </tbody>
+        </table>
+        <br />
+        <br />
+        <button id="add-new-grocery-btn" class="create-btn">
+            Add new grocery
+        </button>
+        <button id="go-home-btn">Home</button>
+    </section>
+    
+    <script>
+        async function getAllItems() {
+            try {
+                const httpResponse = await fetch('/api/items');
+                const jsonResponse = await httpResponse.json();
+                return jsonResponse.results.items;
+            } catch {
+                alert('Oops! An error occurred..');
+            }
+        }
+
+        async function addItemsToTable() {
+            const items = await getAllItems();
+
+            const tbody = document.getElementById('tbody');
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.classList.add('tr')
+        
+                const nameCell = document.createElement('td');
+                nameCell.textContent = item.name;
+                nameCell.classList.add('td');
+                row.appendChild(nameCell);
+        
+                const expiryCell = document.createElement('td');
+                expiryCell.classList.add('td');
+                expiryCell.textContent = item.expiryDate;
+                const isItemExpired = isExpired(item.expiryDate);
+                if (isItemExpired) {
+                    expiryCell.classList.add('expired');
+                    expiryCell.textContent = item.expiryDate + ' (expired!)';
+                }
+                row.appendChild(expiryCell);
+
+                const actionCell = document.createElement('td');
+                actionCell.classList.add('td');
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', () => handleEdit(item.id));
+                actionCell.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => handleDelete(item.id));
+                actionCell.appendChild(deleteBtn);
+                row.appendChild(actionCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        addItemsToTable();
+
+        function handleEdit(id) {
+            window.location.assign('/items/' + id);
+        }
+
+        async function handleDelete(id) {
+            try {
+                const httpResponse = await fetch('/api/items/delete/' + id);
+                const jsonResponse = await httpResponse.json();
+                alert(jsonResponse.message);
+                window.location.reload();
+            } catch {
+                alert('Oops! An error occurred..');
+            }
+        }
+
+        function isExpired(date) {
+            return new Date(date) < new Date();
+        }
+
+        const goHomeBtn = document.getElementById('go-home-btn');
+        goHomeBtn.addEventListener('click', () => {
+            window.location.assign('/');
+        });
+
+        const addNewGroceryBtn = document.getElementById('add-new-grocery-btn');
+        addNewGroceryBtn.addEventListener('click', () => {
+            window.location.assign('/items/create');
+        });
+    </script>
+  </body>
+</html>

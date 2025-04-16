@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Add new grocery</title>
+    <style>
+    </style>
+  </head>
+  <body>
+    <section>
+        <section>
+            <h1>Add new grocery</h1>
+            <input type="text" id="item-name-input" />
+            expiring on
+            <input type="date" id="expiry-date-input" />
+            <button id="submit-btn">Submit</button>
+            <br />
+            <br />
+            <button id="see-all-btn">
+                See all groceries
+            </button>
+            <button id="go-home-btn">Home</button>
+        </section>
+
+    </section>
+    
+    <script>
+        async function createNewItem() {
+            const itemNameInput = document.getElementById("item-name-input");
+            const expiryDateInput = document.getElementById("expiry-date-input");
+
+            const newItem = {
+                name: itemNameInput.value,
+                expiryDate: expiryDateInput.value,
+            };
+
+            try {
+                const httpResponse = await fetch('/api/items', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newItem)
+                });
+                const jsonResponse = await httpResponse.json();
+                alert(jsonResponse.message);
+                window.location.assign('/items');
+            } catch {
+                alert('Oops! An error occurred..');
+            }
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.addEventListener('click', createNewItem);
+
+        const goHomeBtn = document.getElementById('go-home-btn');
+        goHomeBtn.addEventListener('click', () => {
+            window.location.assign('/');
+        });
+
+        const seeAllGroceriesBtn = document.getElementById('see-all-btn');
+        seeAllGroceriesBtn.addEventListener('click', () => {
+            window.location.assign('/items');
+        });
+    </script>
+  </body>
+</html>

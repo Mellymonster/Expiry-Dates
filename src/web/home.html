@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>My Grocery App</title>
+    <style>
+      body { padding-top: 50px; }
+    </style>
+  </head>
+  <body>
+    <section>
+      <h1>Welcome to my grocery app! :D</h1>
+      <button id="see-groceries-btn">See my groceries</button>
+    </section>
+    <script>
+      const seeGroceriesBtn = document.getElementById('see-groceries-btn');
+      seeGroceriesBtn.addEventListener('click', () => {
+        window.location.assign('/items');
+      });
+    </script>
+  </body>
+</html>
